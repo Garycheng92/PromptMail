@@ -40,3 +40,12 @@
 .read-the-docs {
   color: #888;
 }
+
+body {
+  background-image: url('./assets/background_circuits_light_blue.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-position: center;
+}
+
