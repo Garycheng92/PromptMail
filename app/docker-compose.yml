@@ -4,7 +4,7 @@ services:
       context: .
       target: dev
     ports:
-      - "3000:5173"
+      - "3000:5998"
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules
