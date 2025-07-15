@@ -14,7 +14,8 @@
   "type": "commonjs",
   "dependencies": {
     "cors": "^2.8.5",
-    "express": "^5.1.0"
+    "express": "^5.1.0",
+    "openai": "^5.9.0"
   },
   "devDependencies": {
     "chai": "^5.2.1",
