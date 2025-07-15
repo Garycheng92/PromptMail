@@ -15,6 +15,8 @@ services:
     build:
       context: .
       target: dev
+    env_file:
+      - ./backend/.env
     ports:
       - "5000:5000"
     volumes:
