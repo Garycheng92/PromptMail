@@ -6,4 +6,18 @@
   border: 2px solid #0d6efd; /* Bootstrap blue */
   border-radius: 0.5rem;
   text-align: left; /* Ensures left alignment */
+  color: #212529;   /* Dark text for light mode */
+}
+
+/* Dark‐mode overrides */
+body.dark-mode .home-section {
+  background-color: #2a2a2a; /* Dark gray background */
+  border-color: #0d6efd;     /* Keep blue border */
+  color: #f8f9fa;            /* Light text */
+}
+body.dark-mode .home-section h1,
+body.dark-mode .home-section h5,
+body.dark-mode .home-section p,
+body.dark-mode .home-section li {
+  color: #f8f9fa; /* Ensure all nested text is light */
 }

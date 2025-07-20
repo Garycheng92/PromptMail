@@ -1,9 +1,20 @@
-/* MultiEmail.css */
-
 .email-section {
-  background-color: #e6f2ff; /* Light baby blue */
+  background-color: #e6f2ff;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  border: 2px solid #0d6efd; /* Bootstrap primary blue */
+  border: 2px solid #0d6efd;
   border-radius: 0.5rem;
+}
+
+/* Hover highlight */
+.highlight-hover:hover {
+  background-color: #ffd700 !important;
+  color: black !important;
+}
+
+/* Speech button */
+.speech-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
 }

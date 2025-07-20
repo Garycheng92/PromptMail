@@ -1,8 +1,34 @@
-/* Citations.css */
+/* src/pages/Citations.css */
 
 .citations-section {
   background-color: #e6f2ff; /* Light baby blue */
   padding: 1.5rem;
   border: 2px solid #0d6efd; /* Bootstrap blue */
   border-radius: 0.5rem;
+  /* ensure text is dark in light mode */
+  color: #212529;
+}
+
+/* style each list item in light mode */
+.citations-section .list-group-item {
+  background-color: #ffffff;
+  color: #212529;
+  border-color: #dee2e6;
+}
+
+/* Dark‑mode overrides */
+body.dark-mode .citations-section {
+  background-color: #2a2a2a; /* Dark gray background */
+  border-color: #0d6efd;     /* keep the blue border */
+  color: #f8f9fa;            /* Light text */
+}
+
+body.dark-mode .citations-section .list-group-item {
+  background-color: #3a3a3a;  /* Darker list‑item background */
+  color: #f8f9fa;             /* Light text */
+  border-color: #6c757d;      /* Muted gray border */
+}
+
+body.dark-mode .citations-section .list-group-item a {
+  color: #66b2ff;             /* Light blue links for contrast */
 }

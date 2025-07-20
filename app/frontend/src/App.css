@@ -49,3 +49,40 @@ body {
   background-position: center;
 }
 
+/* ------------------------------------------ */
+/* Dark mode overrides when <body>.dark-mode */
+/* ------------------------------------------ */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar,
+body.dark-mode .bg-primary {
+  background-color: #1f1f1f !important;
+}
+
+body.dark-mode .nav-link {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .container,
+body.dark-mode .single-email-section,
+body.dark-mode .email-section {
+  background-color: #1e1e2a !important;
+  border-color: #8888ff !important;
+}
+
+body.dark-mode .form-control {
+  background-color: #2a2a3a;
+  color: #e0e0e0;
+  border: 1px solid #555;
+}
+
+body.dark-mode .btn-primary,
+body.dark-mode .btn-success,
+body.dark-mode .btn-danger,
+body.dark-mode .btn-secondary {
+  filter: brightness(1.2);
+}
+
