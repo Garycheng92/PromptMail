@@ -24,8 +24,7 @@ describe('<ContactUs />', () => {
     });
 
     fireEvent.click(screen.getByRole('button', { name: /send message/i }));
-
-    // ✅ Now this works
+    
     assert.strictEqual(alertMessage, 'Your message has been submitted!');
   });
 });
