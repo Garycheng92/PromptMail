@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Tabs, Tab, Card } from 'react-bootstrap';
 import './MultiEmail.css';
 
