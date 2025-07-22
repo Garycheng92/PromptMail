@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { Tabs, Tab, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
 import './SingleEmail.css'; // contains our baby‑blue background + hover highlight
 

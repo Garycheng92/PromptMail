@@ -1,5 +1,7 @@
-import { useState } from 'react';
+
+import React, { useState } from 'react';
 import { Tabs, Tab, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+
 import './MultiEmail.css';
 
 function MultiEmail() {
