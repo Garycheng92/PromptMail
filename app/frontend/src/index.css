@@ -66,3 +66,56 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+/* --- Dark Mode Overrides --- */
+body.dark-mode {
+  background-color: #121212 !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .navbar-dark .navbar-nav .nav-link {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .container,
+body.dark-mode .single-email-section,
+body.dark-mode .email-section {
+  background-color: #1e1e2a !important;
+}
+
+body.dark-mode .single-email-section,
+body.dark-mode .email-section {
+  border-color: #8888ff !important;
+}
+
+body.dark-mode .output-box,
+body.dark-mode .card {
+  background-color: #2a2a3a !important;
+  color: #e0e0e0;
+}
+
+body.dark-mode .form-control {
+  background-color: #2a2a3a;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+body.dark-mode .btn-primary {
+  background-color: #5555aa;
+  border-color: #444477;
+}
+
+body.dark-mode .btn-secondary {
+  background-color: #444;
+  border-color: #333;
+}
+
+body.dark-mode .btn-success {
+  background-color: #336633;
+  border-color: #224422;
+}
+
+body.dark-mode .btn-danger {
+  background-color: #662222;
+  border-color: #441111;
+}

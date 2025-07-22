@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Tabs, Tab, Card } from 'react-bootstrap';
-import './SingleEmail.css';
+import { Tabs, Tab, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
+import './SingleEmail.css'; // contains our baby‑blue background + hover highlight
 
 function SingleEmail() {
   const [emailText, setEmailText] = useState('');
@@ -10,20 +10,21 @@ function SingleEmail() {
     formal: '',
     casual: '',
     satirical: '',
-    funny: '',
+    punny: '',
     oldEnglish: '',
     teenspeak: '',
   });
 
-  const handleGenerate = async () => {
+  const handleGenerate = () => {
+    // …existing placeholder logic…
     setResponses({
-      summary: '• Thou art invited\n• Attend at sundown\n• Bring forth merriment',
-      formal: 'Dear Sir/Madam, Thank you for your message...',
-      casual: 'Hey! Got your email. Sounds good...',
-      satirical: 'Oh wow, what a *groundbreaking* email...',
-      funny: 'Roses are red, emails are blue, here’s my response, just for you!',
-      oldEnglish: 'Hark! Thy words hath reached mine eyes and struck a chord in mine heart...',
-      teenspeak: 'Yo that email had mad rizz fr 💯. LOL I’m vibing with it big time 🫡',
+      summary: '• Point A\n• Point B\n• Point C',
+      formal: 'Dear Sir/Madam,…',
+      casual: 'Hey, got your email…',
+      satirical: 'Wow, so cutting‑edge…',
+      punny: 'This is how I “pun” your email…',
+      oldEnglish: 'Hark! Thy email…',
+      teenspeak: 'Yo, that was lit fr…',
     });
   };
 
@@ -34,10 +35,25 @@ function SingleEmail() {
       formal: '',
       casual: '',
       satirical: '',
-      funny: '',
+      punny: '',
       oldEnglish: '',
       teenspeak: '',
     });
+  };
+
+  // voice‑to‑text helper
+  const handleSpeechToText = (e) => {
+    if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
+      alert('Speech Recognition not supported');
+      return;
+    }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recog = new SR();
+    recog.lang = 'en-US';
+    recog.start();
+    recog.onresult = (evt) => {
+      setEmailText(evt.results[0][0].transcript);
+    };
   };
 
   return (
@@ -56,16 +72,35 @@ function SingleEmail() {
           {/* Input Section */}
           <div className="col-md-6">
             <h5 className="mb-2">Input Email</h5>
-            <textarea
-              className="form-control"
-              rows="10"
-              placeholder="Paste your email here..."
-              value={emailText}
-              onChange={(e) => setEmailText(e.target.value)}
-            />
+            <div className="position-relative">
+              <textarea
+                className="form-control"
+                rows="10"
+                maxLength={300}
+                placeholder="Paste your email here…"
+                value={emailText}
+                onChange={e => setEmailText(e.target.value)}
+              />
+              <OverlayTrigger overlay={<Tooltip>Voice → text</Tooltip>}>
+                <button
+                  className="btn btn-sm btn-outline-secondary speech-btn"
+                  onClick={handleSpeechToText}
+                >
+                  🎙️
+                </button>
+              </OverlayTrigger>
+            </div>
             <div className="mt-3 d-flex gap-3">
-              <button className="btn btn-primary" onClick={handleGenerate}>Generate</button>
-              <button className="btn btn-secondary" onClick={handleClear}>Clear</button>
+              <OverlayTrigger overlay={<Tooltip>Generate AI responses</Tooltip>}>
+                <button className="btn btn-primary highlight-hover" onClick={handleGenerate}>
+                  Generate
+                </button>
+              </OverlayTrigger>
+              <OverlayTrigger overlay={<Tooltip>Clear input & outputs</Tooltip>}>
+                <button className="btn btn-secondary highlight-hover" onClick={handleClear}>
+                  Clear
+                </button>
+              </OverlayTrigger>
             </div>
           </div>
 
@@ -74,40 +109,37 @@ function SingleEmail() {
             <h5 className="mb-2">AI Response Output</h5>
             <Tabs
               activeKey={activeTab}
-              onSelect={(k) => setActiveTab(k)}
+              onSelect={k => setActiveTab(k)}
               className="mb-3 custom-tabs"
               justify
             >
               {[
-                ['summary', 'Summary'],
-                ['formal', 'Formal'],
-                ['casual', 'Casual'],
-                ['satirical', 'Satirical'],
-                ['funny', 'Funny'],
-                ['oldEnglish', 'Old English'],
-                ['teenspeak', 'Teens Speak'],
-              ].map(([key, label]) => (
+                ['summary','Summary'],
+                ['formal','Formal'],
+                ['casual','Casual'],
+                ['satirical','Satirical'],
+                ['punny','Punny'],
+                ['oldEnglish','Old English'],
+                ['teenspeak','Teens Speak'],
+              ].map(([key,label]) => (
                 <Tab key={key} eventKey={key} title={label}>
                   <Card className="p-3 output-box">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <label htmlFor={`${key}Output`} className="fw-bold">{label}</label>
-                      <button
-                        className="btn btn-sm btn-outline-secondary"
-                        onClick={() => navigator.clipboard.writeText(responses[key])}
-                        title="Copy to clipboard"
-                      >
-                        📋
-                      </button>
+                      <OverlayTrigger overlay={<Tooltip>Copy to clipboard</Tooltip>}>
+                        <button
+                          className="btn btn-sm btn-outline-secondary"
+                          onClick={() => navigator.clipboard.writeText(responses[key])}
+                        >📋</button>
+                      </OverlayTrigger>
                     </div>
                     <textarea
                       id={`${key}Output`}
                       className="form-control"
                       rows="6"
-                      style={{ whiteSpace: 'pre-wrap', overflowY: 'auto' }}
-                      value={responses[key] || `${label} response will appear here after generation.`}
-                      onChange={(e) =>
-                        setResponses({ ...responses, [key]: e.target.value })
-                      }
+                      style={{ whiteSpace:'pre-wrap',overflowY:'auto' }}
+                      value={responses[key] || `${label} will appear here.`}
+                      onChange={e => setResponses(r => ({...r,[key]:e.target.value}))}
                     />
                   </Card>
                 </Tab>

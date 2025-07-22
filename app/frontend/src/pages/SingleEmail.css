@@ -1,9 +1,20 @@
-/* SingleEmail.css */
-
 .single-email-section {
-  background-color: #e6f2ff; /* Light baby blue */
+  background-color: #e6f2ff;    /* baby‑blue */
   padding: 1.5rem;
   margin-bottom: 2rem;
-  border: 2px solid #0d6efd; /* Bootstrap blue border */
+  border: 2px solid #0d6efd;    /* Bootstrap primary blue */
   border-radius: 0.5rem;
+}
+
+/* Hover highlight for buttons */
+.highlight-hover:hover {
+  background-color: #ffd700 !important;  /* warm gold */
+  color: black !important;
+}
+
+/* Speech‑to‑text mic button */
+.speech-btn {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
 }
