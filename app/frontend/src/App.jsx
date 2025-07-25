@@ -27,8 +27,8 @@ function App() {
   return (
     <Router>
       <div className="container-fluid px-0">
-        {/* Logo Banner */}
-        <div className="text-center py-3 bg-primary">
+        {/* Logo Banner — reduced vertical padding */}
+        <div className="text-center py-1 bg-primary">
           <Link to="/">
             <img
               src={darkMode ? logoDark : logoLight}
@@ -94,7 +94,7 @@ function App() {
         </nav>
 
         {/* Page Content */}
-        <div className="container mt-4">
+        <div className="container mt-4 mb-5">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/citations" element={<Citations />} />
