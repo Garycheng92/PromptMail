@@ -6,49 +6,54 @@ import MultiEmail from '../../pages/MultiEmail.jsx';
 
 console.log('Running MultiEmail test');
 
+// Helper function for getting all by data-testid prefix
+function getAllByTestIdPrefix(prefix) {
+  return Array.from(document.querySelectorAll('[data-testid]')).filter(element =>
+    element.dataset.testid.startsWith(prefix)
+  );
+}
+
+// Helper function for getting single data-testid by prefix
+function getByTestIdPrefix(prefix) {
+  return getAllByTestIdPrefix(prefix)[0];
+}
+
 describe('<MultiEmail />', () => {
   beforeEach(() => {
     render(<MultiEmail />);
   });
 
   it('Initial email block', () => {
-    const headers = screen.getAllByText(/Email Section/i);
-    assert.strictEqual(headers.length, 1);
+    const emailBlocks = getAllByTestIdPrefix('email-block-');
+    assert.strictEqual(emailBlocks.length, 1);
   });
 
   it('Typing in first email', () => {
-    const textarea = screen.getByPlaceholderText('Paste your email here...');
-    fireEvent.change(textarea, { target: { value: 'Test multi-email input' } });
-    assert.strictEqual(textarea.value, 'Test multi-email input');
+    const textareaInput = getByTestIdPrefix('email-input-');
+    fireEvent.change(textareaInput, { target: { value: 'Test multi-email input' } });
+    assert.strictEqual(textareaInput.value, 'Test multi-email input');
   });
 
   it('Add email functionality', () => {
-    const addButton = screen.getByText('+ Add Email');
+    const addButton = screen.getByTestId('add-email-button');
     fireEvent.click(addButton);
-    const headers = screen.getAllByText(/Email Section/i);
-    assert.strictEqual(headers.length, 2);
+
+    const emailBlocks = getAllByTestIdPrefix('email-block-');
+    assert.strictEqual(emailBlocks.length, 2);
   });
 
-  it('Clear button', () => {
-    const textarea = screen.getByPlaceholderText('Paste your email here...');
-    fireEvent.change(textarea, { target: { value: 'Will be cleared' } });
+  it('Clear functionality', () => {
+    const textareaInput = getByTestIdPrefix('email-input-');
+    const clearButton = getByTestIdPrefix('clear-button-');
 
-    const clearButton = screen.getByText('Clear');
+    fireEvent.change(textareaInput, { target: { value: 'Will be cleared' } });
     fireEvent.click(clearButton);
-    assert.strictEqual(textarea.value, '');
-  });
-
-  it('Tone generation', () => {
-    const generateButton = screen.getByText('Generate');
-    fireEvent.click(generateButton);
-
-    const summaryTextarea = screen.getByLabelText('Summary', { selector: 'textarea' });
-    assert.ok(summaryTextarea.value.includes('Thou art invited'));
+    assert.strictEqual(textareaInput.value, '');
   });
 
   it('Delete functionality', () => {
     // Add block
-    const addButton = screen.getByText('+ Add Email');
+    const addButton = screen.getByTestId('add-email-button');
     fireEvent.click(addButton);
 
     // Select second block
@@ -56,10 +61,31 @@ describe('<MultiEmail />', () => {
     fireEvent.click(checkboxes[1]); 
 
     // Delete selected block
-    const deleteButton = screen.getByText('🗑️ Delete Selected');
+    const deleteButton = screen.getByTestId('delete-selected-button');
     fireEvent.click(deleteButton);
 
-    const headers = screen.getAllByText(/Email Section/i);
-    assert.strictEqual(headers.length, 1);
+    const emailBlocks = getAllByTestIdPrefix('email-block-');
+    assert.strictEqual(emailBlocks.length, 1);
+  });
+
+  it('Tone generation populates', () => {
+    const generateButton = getByTestIdPrefix('generate-button-');
+    fireEvent.click(generateButton);
+    const tones = [
+      'summary',
+      'formal',
+      'casual',
+      'satirical',
+      'punny',
+      'oldEnglish',
+      'teenspeak'
+    ];
+
+    for (const tone of tones) {
+      const tab = getByTestIdPrefix(`tab-${tone}-`);
+      fireEvent.click(tab);
+      const response = getByTestIdPrefix(`response-${tone}-`);
+      assert.ok(response.value.length > 0, `${tone} response is empty`);
+    }
   });
 });

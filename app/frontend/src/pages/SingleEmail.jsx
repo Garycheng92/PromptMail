@@ -80,6 +80,7 @@ function SingleEmail() {
                 placeholder="Paste your email here…"
                 value={emailText}
                 onChange={e => setEmailText(e.target.value)}
+                data-testid="email-input"
               />
               <OverlayTrigger overlay={<Tooltip>Voice → text</Tooltip>}>
                 <button
@@ -92,12 +93,20 @@ function SingleEmail() {
             </div>
             <div className="mt-3 d-flex gap-3">
               <OverlayTrigger overlay={<Tooltip>Generate AI responses</Tooltip>}>
-                <button className="btn btn-primary highlight-hover" onClick={handleGenerate}>
+                <button 
+                  className="btn btn-primary highlight-hover" 
+                  onClick={handleGenerate}
+                  data-testid="generate-button"
+                >
                   Generate
                 </button>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Clear input & outputs</Tooltip>}>
-                <button className="btn btn-secondary highlight-hover" onClick={handleClear}>
+                <button 
+                  className="btn btn-secondary highlight-hover" 
+                  onClick={handleClear}
+                  data-testid="clear-button"
+                >
                   Clear
                 </button>
               </OverlayTrigger>
@@ -122,7 +131,7 @@ function SingleEmail() {
                 ['oldEnglish','Old English'],
                 ['teenspeak','Teens Speak'],
               ].map(([key,label]) => (
-                <Tab key={key} eventKey={key} title={label}>
+                <Tab key={key} eventKey={key} title={label} data-testid={`tab-${key}`}>
                   <Card className="p-3 output-box">
                     <div className="d-flex justify-content-between align-items-center mb-2">
                       <label htmlFor={`${key}Output`} className="fw-bold">{label}</label>
@@ -130,6 +139,7 @@ function SingleEmail() {
                         <button
                           className="btn btn-sm btn-outline-secondary"
                           onClick={() => navigator.clipboard.writeText(responses[key])}
+                          data-testid="copy-button"
                         >📋</button>
                       </OverlayTrigger>
                     </div>
@@ -140,6 +150,7 @@ function SingleEmail() {
                       style={{ whiteSpace:'pre-wrap',overflowY:'auto' }}
                       value={responses[key] || `${label} will appear here.`}
                       onChange={e => setResponses(r => ({...r,[key]:e.target.value}))}
+                      data-testid={`response-${key}`}
                     />
                   </Card>
                 </Tab>
