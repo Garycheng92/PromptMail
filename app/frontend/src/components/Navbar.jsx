@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { ThemeContext } from '../ThemeContext';
 import { OverlayTrigger, Tooltip } from 'react-bootstrap';
 import { Gear } from 'react-bootstrap-icons';
@@ -19,6 +19,7 @@ function Navbar() {
             alt="PromptMail"
             height="40"
             className="me-2 border border-1 border-dark rounded"
+            data-testid="img-logo"
           />
           PromptMail
         </Link>
@@ -45,7 +46,8 @@ function Navbar() {
               ['/contact', 'Contact Us'],
             ].map(([path, label]) => (
               <li className="nav-item" key={path}>
-                <Link to={path} className="nav-link fs-5">
+                <Link to={path} className="nav-link fs-5" 
+                data-testid={`navlink-${label.replace(/\s+/g, '-').toLowerCase()}`}>
                   {label}
                 </Link>
               </li>
@@ -57,6 +59,7 @@ function Navbar() {
                 <button
                   className="btn btn-link nav-link p-0"
                   onClick={() => setShowDropdown(s => !s)}
+                  data-testid="settings-button"
                 >
                   <Gear size={20} />
                 </button>
@@ -71,6 +74,7 @@ function Navbar() {
                         setDarkMode(!darkMode);
                         setShowDropdown(false);
                       }}
+                      data-testid="theme-button"
                     >
                       {darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                     </button>

@@ -71,19 +71,23 @@ function MultiEmail() {
           <button
             className="btn btn-success highlight-hover"
             onClick={handleAddBlock}
+            data-testid="add-email-button"
           >+ Add Email</button>
         </OverlayTrigger>
         <OverlayTrigger overlay={<Tooltip>Delete selected sections</Tooltip>}>
           <button
             className="btn btn-danger highlight-hover"
             onClick={handleDeleteSelected}
+            data-testid="delete-selected-button"
           >🗑️ Delete Selected</button>
         </OverlayTrigger>
       </div>
 
       {/* Blocks */}
-      {emailBlocks.map((block, i) => (
-        <div key={block.id} className="email-section">
+      {emailBlocks.map((block,i)=>(
+        <div key={block.id} className="email-section"
+          data-testid={`email-block-${block.id}`}
+        >
           {/* Section Header */}
           <div className="d-flex justify-content-between align-items-center mb-3">
             <h5 className="text-primary fw-bold">Email Section {i + 1}</h5>
@@ -113,6 +117,7 @@ function MultiEmail() {
                   placeholder="Paste your email here…"
                   value={block.emailText}
                   onChange={e => updateBlock(block.id, { emailText: e.target.value })}
+                  data-testid={`email-input-${block.id}`}
                 />
                 <OverlayTrigger overlay={<Tooltip>Voice → text</Tooltip>}>
                   <button
@@ -126,12 +131,14 @@ function MultiEmail() {
                   <button
                     className="btn btn-primary highlight-hover"
                     onClick={() => handleGenerate(block.id)}
+                    data-testid={`generate-button-${block.id}`}
                   >Generate</button>
                 </OverlayTrigger>
                 <OverlayTrigger overlay={<Tooltip>Clear this section</Tooltip>}>
                   <button
                     className="btn btn-secondary highlight-hover"
                     onClick={() => handleClear(block.id)}
+                    data-testid={`clear-button-${block.id}`}
                   >Clear</button>
                 </OverlayTrigger>
               </div>
@@ -156,33 +163,36 @@ function MultiEmail() {
                   ['teenspeak','Teens Speak'],
                 ].map(([key,label]) => (
                   <Tab key={key} eventKey={key} title={label}>
-                    <Card className="p-3 output-box">
-                      <div className="d-flex justify-content-between align-items-center mb-2">
-                        <label htmlFor={`${key}-${block.id}`} className="fw-bold">
-                          {label}
-                        </label>
-                        <OverlayTrigger overlay={<Tooltip>Copy to clipboard</Tooltip>}>
-                          <button
-                            className="btn btn-sm btn-outline-secondary"
-                            onClick={() =>
-                              navigator.clipboard.writeText(block.responses[key])
-                            }
-                          >📋</button>
-                        </OverlayTrigger>
-                      </div>
-                      <textarea
-                        id={`${key}-${block.id}`}
-                        className="form-control"
-                        rows="5"
-                        style={{ whiteSpace:'pre-wrap', overflowY:'auto' }}
-                        value={block.responses[key] || `${label} will appear here.`}
-                        onChange={e =>
-                          updateBlock(block.id, {
-                            responses: { ...block.responses, [key]: e.target.value }
-                          })
-                        }
-                      />
-                    </Card>
+                    <div data-testid={`tab-${key}-${block.id}`}>
+                      <Card className="p-3 output-box">
+                        <div className="d-flex justify-content-between align-items-center mb-2">
+                          <label htmlFor={`${key}-${block.id}`} className="fw-bold">
+                            {label}
+                          </label>
+                          <OverlayTrigger overlay={<Tooltip>Copy to clipboard</Tooltip>}>
+                            <button
+                              className="btn btn-sm btn-outline-secondary"
+                              onClick={() =>
+                                navigator.clipboard.writeText(block.responses[key])
+                              }
+                            >📋</button>
+                          </OverlayTrigger>
+                        </div>
+                        <textarea
+                          id={`${key}-${block.id}`}
+                          className="form-control"
+                          rows="5"
+                          style={{ whiteSpace:'pre-wrap', overflowY:'auto' }}
+                          value={block.responses[key] || `${label} will appear here.`}
+                          onChange={e =>
+                            updateBlock(block.id, {
+                              responses: { ...block.responses, [key]: e.target.value }
+                            })
+                          }
+                          data-testid={`response-${key}-${block.id}`}
+                        />
+                      </Card>
+                    </div>
                   </Tab>
                 ))}
               </Tabs>

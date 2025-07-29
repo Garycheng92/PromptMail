@@ -4,6 +4,8 @@ import assert from 'assert';
 import 'jsdom-global/register';
 import ContactUs from '../../pages/ContactUs.jsx';
 
+console.log('Running Contact Page test');
+
 describe('<ContactUs />', () => {
   it('Alert on submission', () => {
     let alertMessage = null;
