@@ -19,12 +19,8 @@
 }
 
 @keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -49,9 +45,9 @@ body {
   background-position: center;
 }
 
-/* ------------------------------------------ */
-/* Dark mode overrides when <body>.dark-mode */
-/* ------------------------------------------ */
+
+/* Dark mode overrides when <body>.dark-mode  */
+
 body.dark-mode {
   background-color: #121212 !important;
   color: #e0e0e0;
@@ -86,3 +82,53 @@ body.dark-mode .btn-secondary {
   filter: brightness(1.2);
 }
 
+body.dark-mode .form-control::placeholder {
+  color: #bbbbbb !important;
+  opacity: 1 !important;
+}
+
+body.dark-mode .home-section,
+body.dark-mode .contact-section,
+body.dark-mode .citations-section {
+  background-color: #1e1e2a !important;
+  border-color:    #8888ff !important;
+}
+
+body.dark-mode .home-section h1,
+body.dark-mode .home-section h5,
+body.dark-mode .home-section p,
+body.dark-mode .home-section li,
+body.dark-mode .home-section a,
+body.dark-mode .contact-section h1,
+body.dark-mode .contact-section h5,
+body.dark-mode .contact-section p,
+body.dark-mode .contact-section li,
+body.dark-mode .contact-section label,
+body.dark-mode .contact-section a,
+body.dark-mode .citations-section h1,
+body.dark-mode .citations-section h5,
+body.dark-mode .citations-section p,
+body.dark-mode .citations-section li,
+body.dark-mode .citations-section a {
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .citations-section .list-group-item {
+  background-color: #2a2a3a !important;
+  border-color:     #444444 !important;
+  color:            #e0e0e0 !important;
+}
+
+body.dark-mode .citations-section .list-group-item a {
+  color: #66b2ff !important;
+}
+
+body.dark-mode .custom-tabs .nav-link.active {
+  background-color: #3a3a3a !important;
+  border-color:     #5a5a5a !important;
+  color:            #e0e0e0 !important;
+}
+
+body.dark-mode .custom-tabs .nav-link {
+  color: #bbbbbb !important;
+}

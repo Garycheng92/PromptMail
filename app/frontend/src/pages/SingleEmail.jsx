@@ -42,7 +42,7 @@ function SingleEmail() {
   };
 
   // voice‑to‑text helper
-  const handleSpeechToText = (e) => {
+  const handleSpeechToText = () => {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
       alert('Speech Recognition not supported');
       return;
@@ -149,7 +149,7 @@ function SingleEmail() {
                       rows="6"
                       style={{ whiteSpace:'pre-wrap',overflowY:'auto' }}
                       value={responses[key] || `${label} will appear here.`}
-                      onChange={e => setResponses(r => ({...r,[key]:e.target.value}))}
+                      onChange={e => setResponses(r => ({ ...r, [key]: e.target.value }))}
                       data-testid={`response-${key}`}
                     />
                   </Card>
