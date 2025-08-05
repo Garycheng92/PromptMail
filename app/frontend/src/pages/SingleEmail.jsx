@@ -1,10 +1,15 @@
 import React, { useState } from 'react';
+import axios from 'axios';
 import { Tabs, Tab, Card, OverlayTrigger, Tooltip } from 'react-bootstrap';
-import './SingleEmail.css'; // contains our baby‑blue background + hover highlight
+import './SingleEmail.css'; // contains our baby-blue background + hover highlight
+
+const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+const TONES = ['summary','formal','casual','satirical','punny','oldEnglish','teenspeak'];
 
 function SingleEmail() {
   const [emailText, setEmailText] = useState('');
   const [activeTab, setActiveTab] = useState('summary');
+  const [loading, setLoading] = useState(false);
   const [responses, setResponses] = useState({
     summary: '',
     formal: '',
@@ -15,17 +20,41 @@ function SingleEmail() {
     teenspeak: '',
   });
 
-  const handleGenerate = () => {
-    // …existing placeholder logic…
-    setResponses({
-      summary: '• Point A\n• Point B\n• Point C',
-      formal: 'Dear Sir/Madam,…',
-      casual: 'Hey, got your email…',
-      satirical: 'Wow, so cutting‑edge…',
-      punny: 'This is how I “pun” your email…',
-      oldEnglish: 'Hark! Thy email…',
-      teenspeak: 'Yo, that was lit fr…',
-    });
+  const handleGenerate = async () => {
+    if (!emailText.trim()) return;
+    setLoading(true);
+
+    try {
+      // real API calls
+      const promises = TONES.map(tone =>
+        axios
+          .post(`${API_BASE}/api/prompt`, { text: emailText, tone })
+          .then(res => ({ tone, result: res.data.result }))
+      );
+      const results = await Promise.all(promises);
+
+      // merge into state
+      const newResp = {};
+      results.forEach(({ tone, result }) => {
+        newResp[tone] = result;
+      });
+      setResponses(newResp);
+    } catch (err) {
+      console.error(err);
+      // fallback placeholder logic if API fails
+      setResponses({
+        summary: '• Point A\n• Point B\n• Point C',
+        formal: 'Dear Sir/Madam,…',
+        casual: 'Hey, got your email…',
+        satirical: 'Wow, so cutting-edge…',
+        punny: 'This is how I “pun” your email…',
+        oldEnglish: 'Hark! Thy email…',
+        teenspeak: 'Yo, that was lit fr…',
+      });
+      alert('Error generating responses, showing placeholders.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleClear = () => {
@@ -41,7 +70,7 @@ function SingleEmail() {
     });
   };
 
-  // voice‑to‑text helper
+  // voice-to-text helper
   const handleSpeechToText = () => {
     if (!window.SpeechRecognition && !window.webkitSpeechRecognition) {
       alert('Speech Recognition not supported');
@@ -82,7 +111,7 @@ function SingleEmail() {
                 onChange={e => setEmailText(e.target.value)}
                 data-testid="email-input"
               />
-              <OverlayTrigger overlay={<Tooltip>Voice → text</Tooltip>}>
+              <OverlayTrigger overlay={<Tooltip>Voice → text</Tooltip>}>
                 <button
                   className="btn btn-sm btn-outline-secondary speech-btn"
                   onClick={handleSpeechToText}
@@ -93,17 +122,18 @@ function SingleEmail() {
             </div>
             <div className="mt-3 d-flex gap-3">
               <OverlayTrigger overlay={<Tooltip>Generate AI responses</Tooltip>}>
-                <button 
-                  className="btn btn-primary highlight-hover" 
+                <button
+                  className="btn btn-primary highlight-hover"
                   onClick={handleGenerate}
+                  disabled={loading}
                   data-testid="generate-button"
                 >
-                  Generate
+                  {loading ? 'Generating…' : 'Generate'}
                 </button>
               </OverlayTrigger>
               <OverlayTrigger overlay={<Tooltip>Clear input & outputs</Tooltip>}>
-                <button 
-                  className="btn btn-secondary highlight-hover" 
+                <button
+                  className="btn btn-secondary highlight-hover"
                   onClick={handleClear}
                   data-testid="clear-button"
                 >
@@ -122,39 +152,42 @@ function SingleEmail() {
               className="mb-3 custom-tabs"
               justify
             >
-              {[
-                ['summary','Summary'],
-                ['formal','Formal'],
-                ['casual','Casual'],
-                ['satirical','Satirical'],
-                ['punny','Punny'],
-                ['oldEnglish','Old English'],
-                ['teenspeak','Teens Speak'],
-              ].map(([key,label]) => (
-                <Tab key={key} eventKey={key} title={label} data-testid={`tab-${key}`}>
-                  <Card className="p-3 output-box">
-                    <div className="d-flex justify-content-between align-items-center mb-2">
-                      <label htmlFor={`${key}Output`} className="fw-bold">{label}</label>
-                      <OverlayTrigger overlay={<Tooltip>Copy to clipboard</Tooltip>}>
-                        <button
-                          className="btn btn-sm btn-outline-secondary"
-                          onClick={() => navigator.clipboard.writeText(responses[key])}
-                          data-testid="copy-button"
-                        >📋</button>
-                      </OverlayTrigger>
-                    </div>
-                    <textarea
-                      id={`${key}Output`}
-                      className="form-control"
-                      rows="6"
-                      style={{ whiteSpace:'pre-wrap',overflowY:'auto' }}
-                      value={responses[key] || `${label} will appear here.`}
-                      onChange={e => setResponses(r => ({ ...r, [key]: e.target.value }))}
-                      data-testid={`response-${key}`}
-                    />
-                  </Card>
-                </Tab>
-              ))}
+              {TONES.map(key => {
+                const label = ({
+                  summary: 'Summary',
+                  formal: 'Formal',
+                  casual: 'Casual',
+                  satirical: 'Satirical',
+                  punny: 'Punny',
+                  oldEnglish: 'Old English',
+                  teenspeak: 'Teens Speak'
+                })[key];
+                return (
+                  <Tab key={key} eventKey={key} title={label} data-testid={`tab-${key}`}>
+                    <Card className="p-3 output-box">
+                      <div className="d-flex justify-content-between align-items-center mb-2">
+                        <label htmlFor={`${key}Output`} className="fw-bold">{label}</label>
+                        <OverlayTrigger overlay={<Tooltip>Copy to clipboard</Tooltip>}>
+                          <button
+                            className="btn btn-sm btn-outline-secondary"
+                            onClick={() => navigator.clipboard.writeText(responses[key])}
+                            data-testid="copy-button"
+                          >📋</button>
+                        </OverlayTrigger>
+                      </div>
+                      <textarea
+                        id={`${key}Output`}
+                        className="form-control"
+                        rows="6"
+                        style={{ whiteSpace:'pre-wrap',overflowY:'auto' }}
+                        value={responses[key] || `${label} will appear here.`}
+                        onChange={e => setResponses(r => ({ ...r, [key]: e.target.value }))}
+                        data-testid={`response-${key}`}
+                      />
+                    </Card>
+                  </Tab>
+                );
+              })}
             </Tabs>
           </div>
         </div>
