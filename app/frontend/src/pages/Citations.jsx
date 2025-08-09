@@ -50,6 +50,29 @@ function Citations() {
               https://getbootstrap.com
             </a>
           </li>
+          <li className="list-group-item">
+            <strong>Ethereal Email</strong><br />
+            Ethereal Email is a fake SMTP service for testing email sending without delivering to real recipients. 
+            It allows developers to preview messages in a web interface.<br />
+            <a href="https://ethereal.email" target="_blank" rel="noopener noreferrer">
+              https://ethereal.email
+            </a>
+          </li>
+          <li className="list-group-item">
+            <strong>Axios</strong><br />
+            Axios is used to handle HTTP requests between the frontend and backend APIs, supporting features like 
+            promises and request/response interceptors.<br />
+            <a href="https://axios-http.com" target="_blank" rel="noopener noreferrer">
+              https://axios-http.com
+            </a>
+          </li>
+          <li className="list-group-item">
+            <strong>Mocha</strong><br />
+            Mocha is a JavaScript testing framework used to run and organize backend unit and integration tests.<br />
+            <a href="https://mochajs.org" target="_blank" rel="noopener noreferrer">
+              https://mochajs.org
+            </a>
+          </li>
         </ul>
       </div>
     </div>
