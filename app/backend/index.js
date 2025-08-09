@@ -1,3 +1,4 @@
+// backend/index.js
 import { prompt } from "./prompts.mjs";
 import cors from "cors";
 import express from "express";
@@ -5,73 +6,68 @@ import express from "express";
 // email support
 import nodemailer from "nodemailer";
 
+// rate limiting
+import { rateLimit } from "express-rate-limit";
+
 const app = express();
 const PORT = 5000;
 
 app.use(cors());
 app.use(express.json());
 
-/*
-  ---------- MAIL TRANSPORT (Ethereal for development) ----------
-  I ended up having to revert from the Gmail/SMTP env-based transport to an
-  Ethereal test account which gets created at server startup.
+// Rate limiting tuning
+// tune these via env:
+//   RATE_LIMIT_WINDOW_MS (default 15 min)
+//   RATE_LIMIT_MAX        (default 100 req/window)
+//   CONTACT_LIMIT_WINDOW_MS (default 10 min)
+//   CONTACT_LIMIT_MAX       (default 10 req/window)
+const apiLimiter = rateLimit({
+  windowMs: Number(process.env.RATE_LIMIT_WINDOW_MS ?? 15 * 60 * 1000),
+  max: Number(process.env.RATE_LIMIT_MAX ?? 100),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-  Ethereal advantages:
-    - No real email is sent
-    - we will get a preview URL to view the email in a browser
-    - No app passwords or 2 step authenication needed
+// Stricter limiter for contact (email-sending) endpoints
+const contactLimiter = rateLimit({
+  windowMs: Number(process.env.CONTACT_LIMIT_WINDOW_MS ?? 10 * 60 * 1000),
+  max: Number(process.env.CONTACT_LIMIT_MAX ?? 10),
+  standardHeaders: true,
+  legacyHeaders: false,
+});
 
-  To test this functionality with docker:
-  enter the following into the Git Bash terminal:
-  
-  docker compose up -d
+// Apply general limiter to all API routes
+app.use("/api", apiLimiter);
 
-  you'll see a message like this:
-  "Ethereal SMTP ready"
-  "Login: bswyuptjdpma3gol@ethereal.email"
-  "Pass:  2RJvrHgeSftYNNMsZ8"
+// ---------- Nodemailer transport ----------
+// Set these in backend/.env (examples):
+//   SMTP_HOST=smtp.gmail.com
+//   SMTP_PORT=465
+//   SMTP_USER=your.email@yourdomain.com
+//   SMTP_PASS=your_app_password_or_smtp_password
+//   CONTACT_TO=owner@yourdomain.com
+//   CONTACT_FROM=no-reply@yourdomain.com   (optional; defaults to SMTP_USER)
+const {
+  SMTP_HOST,
+  SMTP_PORT,
+  SMTP_USER,
+  SMTP_PASS,
+  CONTACT_TO,
+  CONTACT_FROM,
+} = process.env;
 
-  then on a separate Git bash terminal, enter:
-  
-  docker compose logs -f backend
-  Then go back to the the PromptMailAI Contact Us Page from the UI, type in a name, an email, a message and press enter...check back with the terminal
+// defaults for Gmail
+const transport = nodemailer.createTransport({
+  host: SMTP_HOST || "smtp.gmail.com",
+  port: Number(SMTP_PORT) || 465,
+  secure: (SMTP_PORT ? Number(SMTP_PORT) === 465 : true), // true for 465, false for 587
+  auth: {
+    user: SMTP_USER,
+    pass: SMTP_PASS,
+  },
+});
 
-  The terminal will show something like this.. click it and you'll see the message from the UI:
-  Ethereal Preview URL: https://ethereal.email/message/aJbOvEtUvPQALbk8aJbRO2XUKwn.zTRMAAAAAdX1tUsUmJCk9DDRGnYHJpo
-
-
-
-
-
-*/
-let transport = null;
-let etherealAccount = null;
-
-(async () => {
-  try {
-    etherealAccount = await nodemailer.createTestAccount();
-
-    transport = nodemailer.createTransport({
-      host: etherealAccount.smtp.host,
-      port: etherealAccount.smtp.port,
-      secure: etherealAccount.smtp.secure, // true for 465, false otherwise
-      auth: {
-        user: etherealAccount.user,
-        pass: etherealAccount.pass,
-      },
-    });
-
-    console.log("Ethereal SMTP ready ✅");
-    console.log("Login:", etherealAccount.user);
-    console.log("Pass: ", etherealAccount.pass);
-  } catch (err) {
-    console.error("Failed to initialize Ethereal transport:", err);
-  }
-})();
-
-
-//Health-check for mailer
-
+//  Health-check for mailer covered by /api limiter 
 app.get("/api/contact/health", async (_req, res) => {
   if (!transport) {
     return res.json({ ok: false, error: "Mail transport not initialized yet." });
@@ -86,7 +82,7 @@ app.get("/api/contact/health", async (_req, res) => {
   }
 });
 
-// API route
+//  API Prompt 
 app.post("/api/prompt", async (req, res) => {
   const { text, tone } = req.body;
   try {
@@ -97,12 +93,12 @@ app.post("/api/prompt", async (req, res) => {
   }
 });
 
-// Contact Us Route using the ethereal transport
-app.post("/api/contact", async (req, res) => {
+// Contact Us Route
+app.post("/api/contact", contactLimiter, async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
 
-    // validation 
+    // validation
     if (!name || typeof name !== "string") {
       return res.status(400).json({ error: "Name is required." });
     }
@@ -114,10 +110,12 @@ app.post("/api/contact", async (req, res) => {
       return res.status(400).json({ error: "Message is required." });
     }
 
-    if (!transport) {
+    const to = CONTACT_TO || SMTP_USER;
+    const from = CONTACT_FROM || SMTP_USER;
+    if (!SMTP_USER || !SMTP_PASS) {
       return res
         .status(500)
-        .json({ error: "Email transport is not initialized on the server." });
+        .json({ error: "Email transport is not configured on the server." });
     }
 
     const subject = `PromptMail Contact: ${name} <${email}>`;
@@ -137,30 +135,24 @@ ${message}
       </div>
     `;
 
-    
-    const info = await transport.sendMail({
-      to: "contact@promptmail.ethereal",           
-      from: `"PromptMail Contact" <no-reply@promptmail.dev>`,
-      replyTo: `${name} <${email}>`,               // replies go back to the user
+    await transport.sendMail({
+      to,
+      from,
+      replyTo: `${name} <${email}>`, // enables replies to go back to the user
       subject,
       text: textBody,
       html: htmlBody,
     });
 
-    const previewUrl = nodemailer.getTestMessageUrl(info);
-    if (previewUrl) {
-      console.log("Ethereal Preview URL:", previewUrl);
-    }
-
-    // Keep response shape compatible (ok: true). Extra preview field is additive/non-breaking.
-    res.json({ ok: true, preview: previewUrl || null });
+    res.json({ ok: true });
   } catch (err) {
     console.error("Contact form send failed:", err);
-    res.status(500).json({ error: "Failed to send your message. Please try again later." });
+    res
+      .status(500)
+      .json({ error: "Failed to send your message. Please try again later." });
   }
 });
 
-// ------------------------------------------------------------------------
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
