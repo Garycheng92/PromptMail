@@ -21,6 +21,8 @@ app.use(express.json());
     - we will get a preview URL to view the email in a browser
     - No app passwords or 2 step authenication needed
 
+  To test this functionality 
+
 
 */
 let transport = null;

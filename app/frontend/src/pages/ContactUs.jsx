@@ -82,12 +82,12 @@ function ContactUs() {
         {/* Status messages */}
         {sentOk && (
           <div className="alert alert-success" role="alert">
-            ✅ Your message has been sent. We’ll be in touch!
+             Your message has been sent. We’ll be in touch!
           </div>
         )}
         {serverError && (
           <div className="alert alert-danger" role="alert">
-            ❌ {serverError}
+             {serverError}
           </div>
         )}
 
