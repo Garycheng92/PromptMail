@@ -21,7 +21,26 @@ app.use(express.json());
     - we will get a preview URL to view the email in a browser
     - No app passwords or 2 step authenication needed
 
-  To test this functionality 
+  To test this functionality with docker:
+  enter the following into the Git Bash terminal:
+  
+  docker compose up -d
+
+  you'll see a message like this:
+  "Ethereal SMTP ready"
+  "Login: bswyuptjdpma3gol@ethereal.email"
+  "Pass:  2RJvrHgeSftYNNMsZ8"
+
+  then on a separate Git bash terminal, enter:
+  
+  docker compose logs -f backend
+  Then go back to the the PromptMailAI Contact Us Page from the UI, type in a name, an email, a message and press enter...check back with the terminal
+
+  The terminal will show something like this.. click it and you'll see the message from the UI:
+  Ethereal Preview URL: https://ethereal.email/message/aJbOvEtUvPQALbk8aJbRO2XUKwn.zTRMAAAAAdX1tUsUmJCk9DDRGnYHJpo
+
+
+
 
 
 */
