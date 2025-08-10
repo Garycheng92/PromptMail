@@ -1,39 +1,38 @@
 # ===== Development Stage =====
 FROM node:24-alpine AS dev
 WORKDIR /app
-
 # Install global tools
 RUN npm install -g nodemon
-
 # Frontend setup
 WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json ./
+COPY app/frontend/package.json app/frontend/package-lock.json ./
 RUN npm install --include=dev
-COPY frontend .
-
+COPY app/frontend .
 # Backend setup
 WORKDIR /app/backend
-COPY backend/package.json backend/package-lock.json ./
+COPY app/backend/package.json app/backend/package-lock.json ./
 RUN npm install
-COPY backend .
-
+COPY app/backend .
 WORKDIR /app
 CMD ["sh", "-c", "cd frontend && npm run dev & cd backend && npm run dev"]
 
 # ===== Frontend Builder =====
-FROM node:24-alpine AS frontend-builder
+FROM node:24 AS frontend-builder
 WORKDIR /app/frontend
-COPY frontend/package.json frontend/package-lock.json ./
-RUN npm install
-COPY frontend .
-RUN npm run build
+COPY app/frontend/package.json app/frontend/package-lock.json ./
+RUN npm ci
+# Install the missing rollup dependency explicitly
+RUN npm install @rollup/rollup-linux-x64-gnu --save-optional
+COPY app/frontend .
+# Set permissions and run build
+RUN chmod -R 755 node_modules/.bin && node node_modules/vite/bin/vite.js build
 
 # ===== Backend Builder =====
 FROM node:24-alpine AS backend-builder
 WORKDIR /app/backend
-COPY backend/package.json backend/package-lock.json ./
+COPY app/backend/package.json app/backend/package-lock.json ./
 RUN npm install
-COPY backend .
+COPY app/backend .
 
 # ===== Production Image =====
 FROM node:24-alpine

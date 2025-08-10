@@ -5,11 +5,9 @@ steps:
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-f', 'app/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/promptmail', '.']
   
-  # Push the image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/$PROJECT_ID/promptmail']
   
-  # Deploy to Cloud Run
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'

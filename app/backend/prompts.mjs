@@ -34,7 +34,7 @@ const PROMPT_TONES = {
     version: "2",
   },
   old: {
-    id: "pmpt_68759b96852881948c46aa73dadf0c490d3bf61a11fd9233",
+    id: "pmpt_68759b96852881948c46aa73dadf0c490d3bf61a11fd92333",
     version: "2",
   },
   teen: {

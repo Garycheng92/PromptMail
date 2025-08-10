@@ -2,15 +2,19 @@
 import { prompt } from "./prompts.mjs";
 import cors from "cors";
 import express from "express";
+import path from "path";
+import { fileURLToPath } from "url";
 
 // email support
 import nodemailer from "nodemailer";
 
-// rate limiting
 import { rateLimit } from "express-rate-limit";
 
 const app = express();
-const PORT = 5000;
+const PORT = process.env.PORT || 5000;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(cors());
 app.use(express.json());
@@ -28,7 +32,6 @@ const apiLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Stricter limiter for contact (email-sending) endpoints
 const contactLimiter = rateLimit({
   windowMs: Number(process.env.CONTACT_LIMIT_WINDOW_MS ?? 10 * 60 * 1000),
   max: Number(process.env.CONTACT_LIMIT_MAX ?? 10),
@@ -36,7 +39,6 @@ const contactLimiter = rateLimit({
   legacyHeaders: false,
 });
 
-// Apply general limiter to all API routes
 app.use("/api", apiLimiter);
 
 // ---------- Nodemailer transport ----------
@@ -56,18 +58,16 @@ const {
   CONTACT_FROM,
 } = process.env;
 
-// defaults for Gmail
 const transport = nodemailer.createTransport({
   host: SMTP_HOST || "smtp.gmail.com",
   port: Number(SMTP_PORT) || 465,
-  secure: (SMTP_PORT ? Number(SMTP_PORT) === 465 : true), // true for 465, false for 587
+  secure: (SMTP_PORT ? Number(SMTP_PORT) === 465 : true),
   auth: {
     user: SMTP_USER,
     pass: SMTP_PASS,
   },
 });
 
-//  Health-check for mailer covered by /api limiter 
 app.get("/api/contact/health", async (_req, res) => {
   if (!transport) {
     return res.json({ ok: false, error: "Mail transport not initialized yet." });
@@ -82,7 +82,6 @@ app.get("/api/contact/health", async (_req, res) => {
   }
 });
 
-//  API Prompt 
 app.post("/api/prompt", async (req, res) => {
   const { text, tone } = req.body;
   try {
@@ -93,7 +92,6 @@ app.post("/api/prompt", async (req, res) => {
   }
 });
 
-// Contact Us Route
 app.post("/api/contact", contactLimiter, async (req, res) => {
   try {
     const { name, email, message } = req.body || {};
@@ -138,7 +136,7 @@ ${message}
     await transport.sendMail({
       to,
       from,
-      replyTo: `${name} <${email}>`, // enables replies to go back to the user
+      replyTo: `${name} <${email}>`,
       subject,
       text: textBody,
       html: htmlBody,
@@ -153,6 +151,17 @@ ${message}
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.use(express.static(path.join(__dirname, '../public')));
+
+
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+app.get(/^(?!\/api).*/, (req, res) => {
+  res.sendFile(path.join(__dirname, '../public/index.html'));
+});
+
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
