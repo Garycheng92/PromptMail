@@ -33,11 +33,11 @@ const PROMPT_TONES = {
     id: "pmpt_68759bd351348190b3598d91dd533e7308e06dd146130238",
     version: "2",
   },
-  old: {
+  oldEnglish: {
     id: "pmpt_68759b96852881948c46aa73dadf0c490d3bf61a11fd92333",
     version: "2",
   },
-  teen: {
+  teenspeak: {
     id: "pmpt_68759b7b97f881969bbee5fcf30c576d0a52967ab50b1a62",
     version: "2",
   },

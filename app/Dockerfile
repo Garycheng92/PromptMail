@@ -21,10 +21,9 @@ FROM node:24 AS frontend-builder
 WORKDIR /app/frontend
 COPY app/frontend/package.json app/frontend/package-lock.json ./
 RUN npm ci
-# Install the missing rollup dependency explicitly
 RUN npm install @rollup/rollup-linux-x64-gnu --save-optional
 COPY app/frontend .
-# Set permissions and run build
+ENV VITE_API_BASE=https://promptmail-223699423211.us-east4.run.app
 RUN chmod -R 755 node_modules/.bin && node node_modules/vite/bin/vite.js build
 
 # ===== Backend Builder =====
