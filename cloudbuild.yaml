@@ -1,7 +1,23 @@
 options:
   logging: CLOUD_LOGGING_ONLY
+
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-f', 'app/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/your-image-name', 'app']
+    args: ['build', '-f', 'app/Dockerfile', '-t', 'gcr.io/$PROJECT_ID/promptmail', '.']
+  
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/$PROJECT_ID/promptmail']
+  
+  - name: 'gcr.io/cloud-builders/gcloud'
+    args:
+      - 'run'
+      - 'deploy'
+      - 'promptmail'
+      - '--image=gcr.io/$PROJECT_ID/promptmail'
+      - '--region=us-east4'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--port=5000'
+
 images:
-  - 'gcr.io/$PROJECT_ID/your-image-name'
+  - 'gcr.io/$PROJECT_ID/promptmail'
