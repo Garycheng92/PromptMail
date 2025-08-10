@@ -31,10 +31,10 @@ const PROMPT_TONES = {
   },
   formal: {
     id: "pmpt_68759bd351348190b3598d91dd533e7308e06dd146130238",
-    version: "2",
+    version: "3",
   },
   oldEnglish: {
-    id: "pmpt_68759b96852881948c46aa73dadf0c490d3bf61a11fd92333",
+    id: "pmpt_68759b96852881948c46aa73dadf0c490d3bf61a11fd9233",
     version: "2",
   },
   teenspeak: {
